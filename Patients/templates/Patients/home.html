@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> COVID PATIENT MANAGENT HOMEPAGE </title>
+</head>
+
+<body>
+    <h1> COVID PATIENT MANAGENT HOMEPAGE</h1>
+
+    <small class="text-muted">
+        Not a patient?
+        <a class="ml-2" href="{% url 'register' %}"> SIGN UP </a>
+    </small>
+
+    <small class="text-muted">
+        Already a patient?
+        <a class="ml-2" href="{% url 'login' %}"> SIGN IN </a>
+    </small>
+
+    <small class="text-muted">
+        Administrator?
+        <a class="ml-2" href="{% url 'admin:index' %}"> ADMIN LOGIN </a>
+    </small>
+
+    <h2>Add Picture or some stuff to make the portal look good. </h2>
+</body>
+</html>

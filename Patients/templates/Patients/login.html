@@ -1,0 +1,43 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+
+<body>
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4"> LOG IN </legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit"> LOGIN </button>
+            </div>
+        </form>
+
+        <div class="border-top pt-3">
+            <small class="text-muted">
+                Not a patient?
+                <a class="ml-2" href="{% url 'register' %}"> REGISTER </a>
+            </small>
+        </div>
+
+        <div class="border-top pt-3">
+            <small class="text-muted">
+                Admininstrator?
+                <a class="ml-2" href="{% url 'admin:index' %}"> LOGIN AS ADMIN </a>
+            </small>
+        </div>
+
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
