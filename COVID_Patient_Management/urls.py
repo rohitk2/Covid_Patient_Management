@@ -20,8 +20,10 @@ from Patients import views as Patient_views
 from Patient_Management.admin import admin_area
 
 
+
 urlpatterns = [
     path('admin/', admin_area.urls),
+    #path('admin/', admin.site.urls),
     path('register/', Patient_views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='Patients/login.html'), name='login'),
     path('user_page/', Patient_views.user_page, name='user-page'),
