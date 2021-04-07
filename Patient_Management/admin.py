@@ -13,3 +13,5 @@ admin_area = AdminPage(name ='COVID Patient Management Admin')
 
 admin_area.register(models.Patient_Data)
 admin_area.register(User)
+
+
