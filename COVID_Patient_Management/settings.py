@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = '(g^mn+8@l($5bye6l*90g7+^1gmv#%v^s1+-bore7&*3f+88^3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ec2-3-143-112-96.us-east-2.compute.amazonaws.com']
 
 
 # Application definition
@@ -125,3 +126,4 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'user-page'
 LOGOUT_REDIRECT_URL = 'home'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
