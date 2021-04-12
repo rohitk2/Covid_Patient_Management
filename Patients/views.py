@@ -35,6 +35,7 @@ def user_page(request) :
     #Get the corresponding id for the username
     Patient = [(dict['username'], dict['id']) for dict in Patient_user_info if dict['username'] == patient][0]
     full_data = [data for data in Patient_data if data['patient_id'] == Patient[1]]
+    print(full_data)
     #input the data in to the html page
     context = {
         'user': Patient[0],
