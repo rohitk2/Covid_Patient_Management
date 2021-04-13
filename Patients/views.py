@@ -35,10 +35,12 @@ def user_page(request) :
     #Get the corresponding id for the username
     Patient = [(dict['username'], dict['id']) for dict in Patient_user_info if dict['username'] == patient][0]
     full_data = [data for data in Patient_data if data['patient_id'] == Patient[1]]
-    print(full_data)
+    # print(full_data)
+    json_full_data = json.dumps(full_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    # print(json_full_data)
     #input the data in to the html page
     context = {
         'user': Patient[0],
-        'full_data': full_data
+        'full_data': json_full_data
     }
     return render(request, 'Patients/user_page.html', context)
