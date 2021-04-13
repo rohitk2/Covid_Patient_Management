@@ -26,8 +26,8 @@ SECRET_KEY = '(g^mn+8@l($5bye6l*90g7+^1gmv#%v^s1+-bore7&*3f+88^3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True #False
 
-ALLOWED_HOSTS = ['ec2-3-143-112-96.us-east-2.compute.amazonaws.com']
-#ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ['ec2-3-143-112-96.us-east-2.compute.amazonaws.com']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
