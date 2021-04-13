@@ -4,6 +4,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from Patient_Management.models import Patient_Data
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 def home(request) :
     return render(request, 'Patients/home.html')
