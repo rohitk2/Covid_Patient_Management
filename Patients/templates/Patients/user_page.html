@@ -1,16 +1,285 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>{{user}} data</title>
+    <style>
+        #rawdata {
+            visibility: hidden;
+            height: 0px;
+        }
+
+        .graph {
+            border-left: 1px solid #666;
+            border-right: 1px solid #666;
+            border-top: 1px solid #666;
+            border-bottom: 1px solid #666;
+            width: 425px;
+            height: 280px;
+            padding-top: 15px;
+            margin: 10px;
+            border-radius: 4px;
+        }
+
+        table {
+            margin-left: 10px;
+        }
+
+        .mg-chart-title {
+            font-size: 1.4em;
+        }
+
+        .mg-chart-description {
+            font-size: 1.3em;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet" type="text/css">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <link rel="stylesheet" href="{% static 'metricsgraphics.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="{% static 'metricsgraphics.js' %}"></script>
+    <script>
+        function loadGraphs()
+        {
+            var dataValue = document.querySelector('#rawdata').textContent
+            var jsonData = JSON.parse(dataValue)
+            var defaultColor = null
+            var highColor = "#8C001A"
+            var lowColor = "#FFAC63"
+            var normalValues = {
+                temperature : {
+                    min: 95,
+                    max: 115,
+                    normal: 98
+                },
+                BPDiastolic : {
+                    min: 77,
+                    max: 98,
+                    normal: 84
+                },
+                BPSystolic : {
+                    min: 115,
+                    max: 145,
+                    normal: 129
+                },
+                BloodOxygen : {
+                    min: 70,
+                    max: 120,
+                    normal: 100
+                },
+                pulse : {
+                    min: 55,
+                    max: 135,
+                    normal: 100
+                }
+            }
+            
+            var parsedData = []
+            var currentDataPoint = null;
+            jsonData.forEach(dataElem => {
+                elem = {
+                    timestamp: new Date(dataElem.timestamp),
+                    temperature: dataElem.temperature,
+                    BPDiastolic: dataElem.BPDiastolic,
+                    BPSystolic: dataElem.BPSystolic,
+                    BloodOxygen: dataElem.BloodOxygen,
+                    id: dataElem.id,
+                    patient_id: dataElem.patient_id,
+                    pulse: dataElem.pulse
+                }
+                parsedData.push(elem)
+
+                if (dataElem.temperature <= normalValues.temperature.min)
+                {
+                    normalValues.temperature.min = dataElem.temperature - 1
+                }
+                if (dataElem.temperature >= normalValues.temperature.max)
+                {
+                    normalValues.temperature.max = dataElem.temperature + 1
+                }
+
+                if (dataElem.BPDiastolic <= normalValues.BPDiastolic.min)
+                {
+                    normalValues.BPDiastolic.min = dataElem.BPDiastolic - 1
+                }
+                if (dataElem.BPDiastolic >= normalValues.BPDiastolic.max)
+                {
+                    normalValues.BPDiastolic.max = dataElem.BPDiastolic + 1
+                }
+
+                if (dataElem.BPSystolic <= normalValues.BPSystolic.min)
+                {
+                    normalValues.BPSystolic.min = dataElem.BPSystolic - 1
+                }
+                if (dataElem.BPSystolic >= normalValues.BPSystolic.max)
+                {
+                    normalValues.BPSystolic.max = dataElem.BPSystolic + 1
+                }
+
+                if (dataElem.BloodOxygen <= normalValues.BloodOxygen.min)
+                {
+                    normalValues.BloodOxygen.min = dataElem.BloodOxygen - 1
+                }
+                if (dataElem.BloodOxygen >= normalValues.BloodOxygen.max)
+                {
+                    normalValues.BloodOxygen.max = dataElem.BloodOxygen + 1
+                }
+
+                if (dataElem.pulse <= normalValues.pulse.min)
+                {
+                    normalValues.pulse.min = dataElem.pulse - 1
+                }
+                if (dataElem.pulse >= normalValues.pulse.max)
+                {
+                    normalValues.pulse.max = dataElem.pulse + 1
+                }
+
+                if (currentDataPoint == null || currentDataPoint.timestamp < elem.timestamp)
+                {
+                    currentDataPoint = elem
+                }
+
+            });
+
+            if (parsedData.length > 0)
+            {
+                var baselineLabel = '';
+                MG.data_graphic({
+                    title: "Temperature",
+                    description: "Temperature readings for {{ user }}",
+                    animate_on_load: true,
+                    data: parsedData,
+                    markers: [],
+                    width: 400,
+                    height: 250,
+                    target: ".tempGraph",
+                    interpolate: d3.curveLinear,
+                    baselines: [{value: normalValues.temperature.normal, label: baselineLabel}],
+                    markers: [{'timestamp': currentDataPoint.timestamp, label: currentDataPoint.temperature}],
+                    min_y: normalValues.temperature.min,
+                    max_y: normalValues.temperature.max,
+                    color: currentDataPoint.temperature > normalValues.temperature.normal ? highColor : defaultColor,
+                    area: false,
+                    x_accessor: "timestamp",
+                    y_accessor: "temperature",
+                    utc_time:true
+                });
+
+                MG.data_graphic({
+                    title: "Pulse",
+                    description: "Pulse readings for {{ user }}",
+                    data: parsedData,
+                    animate_on_load: true,
+                    markers: [],
+                    width: 400,
+                    height: 250,
+                    target: ".pulseGraph",
+                    interpolate: d3.curveLinear,
+                    baselines: [{value: normalValues.pulse.normal, label: baselineLabel}],
+                    markers: [{'timestamp': currentDataPoint.timestamp, label: currentDataPoint.pulse}],
+                    color: currentDataPoint.pulse > normalValues.pulse.normal ? highColor : defaultColor,
+                    min_y: normalValues.pulse.min,
+                    max_y: normalValues.pulse.max,
+                    area: false,
+                    x_accessor: "timestamp",
+                    y_accessor: "pulse",
+                    utc_time:true
+                });
+
+                MG.data_graphic({
+                    title: "BloodOxygen",
+                    description: "BloodOxygen readings for {{ user }}",
+                    data: parsedData,
+                    animate_on_load: true,
+                    markers: [],
+                    width: 400,
+                    height: 250,
+                    target: ".bloodOxygenGraph",
+                    interpolate: d3.curveLinear,
+                    baselines: [{value: normalValues.BloodOxygen.normal, label: baselineLabel}],
+                    markers: [{'timestamp': currentDataPoint.timestamp, label: currentDataPoint.BloodOxygen}],
+                    color: currentDataPoint.BloodOxygen > normalValues.BloodOxygen.normal ? highColor : defaultColor,
+                    min_y: normalValues.BloodOxygen.min,
+                    max_y: normalValues.BloodOxygen.max,
+                    area: false,
+                    x_accessor: "timestamp",
+                    y_accessor: "BloodOxygen",
+                    utc_time:true
+                });
+
+                MG.data_graphic({
+                    title: "BPDiastolic",
+                    description: "BPDiastolic readings for {{ user }}",
+                    data: parsedData,
+                    animate_on_load: true,
+                    markers: [],
+                    width: 400,
+                    height: 250,
+                    target: ".bpDiastolicGraph",
+                    interpolate: d3.curveLinear,
+                    baselines: [{value: normalValues.BPDiastolic.normal, label: baselineLabel}],
+                    markers: [{'timestamp': currentDataPoint.timestamp, label: currentDataPoint.BPDiastolic}],
+                    color: currentDataPoint.BPDiastolic > normalValues.BPDiastolic.normal ? highColor : defaultColor,
+                    min_y: normalValues.BPDiastolic.min,
+                    max_y: normalValues.BPDiastolic.max,
+                    area: false,
+                    x_accessor: "timestamp",
+                    y_accessor: "BPDiastolic",
+                    utc_time:true
+                });
+
+                MG.data_graphic({
+                    title: "BPSystolic",
+                    description: "BPSystolic readings for {{ user }}",
+                    data: parsedData,
+                    animate_on_load: true,
+                    markers: [],
+                    width: 400,
+                    height: 250,
+                    target: ".bpSystolicGraph",
+                    interpolate: d3.curveLinear,
+                    baselines: [{value: normalValues.BPSystolic.normal, label: baselineLabel}],
+                    markers: [{'timestamp': currentDataPoint.timestamp, label: currentDataPoint.BPSystolic}],
+                    color: currentDataPoint.BPSystolic > normalValues.BPSystolic.normal ? highColor : defaultColor,
+                    min_y: normalValues.BPSystolic.min,
+                    max_y: normalValues.BPSystolic.max,
+                    area: false,
+                    x_accessor: "timestamp",
+                    y_accessor: "BPSystolic",
+                    utc_time:true
+                });
+            }
+        }
+    </script>
 </head>
 
-<body>
-    <h1> USER PAGE </h1>
-    <p>{{ user }}</p>
-    <p>{{ full_data.temperature }}</p>
-    <p>{{ full_data.pulse }}</p>
-    <p>{{ full_data.BloodOxygen }}</p>
-    <p>{{ full_data.BPSystolic }}</p>
-    <p>{{ full_data.BPDiastolic }}</p>
+<body onload="loadGraphs()">
+    <h1> User Page for {{ user }}</h1>
+    <p id="rawdata">{{ full_data }}</p>
+    <table>
+        <tr>
+            <td>
+                <div class="graph tempGraph"></div>
+            </td>
+            <td>
+                <div class="graph pulseGraph"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="graph bloodOxygenGraph"></div>
+            </td>
+            <td>
+                <div class="graph bpDiastolicGraph"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="graph bpSystolicGraph"></div>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
